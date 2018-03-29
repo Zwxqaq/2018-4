@@ -1,0 +1,247 @@
+###单行函数基本操作形式
+    姓名本身是大写字母，查询的是小写字母，考虑此情况，对保存的数据进行处理，使用函数库实现特定功能
+    在oracle中函数基本结构：
+    返回值 函数名称（列|数据）
+    字符串函数，数值函数，日期函数，转换函数，通用函数
+###字符串函数 
+    对字符串数据进行处理
+    UPPER() LOWER() INITCAP() REPLACE() LENGTH() SUBSTR()
+  #大小写转换函数
+    转大写函数 字符串 UPPER(列|字符串）
+    转小写函数 字符串 LOWER(列|字符串）
+    dual表
+    对输入数据大小写处理
+    SQL> SELECT LOWER('Hello') FROM emp;
+
+LOWER('HEL
+----------
+hello
+hello
+hello
+hello
+hello
+hello
+hello
+hello
+hello
+hello
+hello
+
+LOWER('HEL
+----------
+hello
+hello
+hello
+
+已选择14行。
+
+SQL> SELECT DISTINCT LOWER('Hello') FROM emp;
+
+LOWER('HEL
+----------
+hello
+
+SQL> SELECT DISTINCT LOWER('Hello') FROM dual;
+
+LOWER('HEL
+----------
+hello
+
+SQL> SELECT LOWER('Hello') FROM dual;
+
+LOWER('HEL
+----------
+hello
+
+SQL> SELECT UPPER('Hello') FROM dual;
+
+UPPER('HEL
+----------
+HELLO
+
+SQL> SELECT * FROM emp WHERE ename='&inputname';
+输入 inputname 的值:  smith
+原值    1: SELECT * FROM emp WHERE ename='&inputname'
+新值    1: SELECT * FROM emp WHERE ename='smith'
+
+未选定行
+
+SQL> SELECT * FROM emp WHERE ename=UPPER('&inputname');
+输入 inputname 的值:  smith
+原值    1: SELECT * FROM emp WHERE ename=UPPER('&inputname')
+新值    1: SELECT * FROM emp WHERE ename=UPPER('smith')
+
+     EMPNO ENAME                JOB                       MGR HIREDATE              SAL       COMM     DEPTNO
+---------- -------------------- ------------------ ---------- -------------- ---------- ---------- ----------
+      7369 SMITH                CLERK                    7902 17-12月-80            800                 20
+      
+      
+      ##在数据保存时，数据统一为大写或小写字母，查询就可以直接特定函数处理
+      ##原始保存，查询时数据进行大写处理
+      ##在不区分大小写操作，就必须对数据提前处理，提高性能
+      
+      
+ ##观察首字母大写
+      SQL> SELECT INITCAP('Hello World') FROM dual;
+
+INITCAP('HELLOWORLD')
+----------------------
+Hello World
+  ##接受数据链
+  SQL> SELECT INITCAP(ename) FROM emp;
+
+INITCAP(ENAME)
+--------------------
+Smith
+Allen
+Ward
+Jones
+Martin
+Blake
+Clark
+Scott
+King
+Turner
+Adams
+
+INITCAP(ENAME)
+--------------------
+James
+Ford
+Miller
+
+已选择14行。
+ ##字符串长度
+    雇员姓名和长度
+    SQL> SELECT ename,LENGTH(ename) FROM emp;
+
+ENAME                LENGTH(ENAME)
+-------------------- -------------
+SMITH                            5
+ALLEN                            5
+WARD                             4
+JONES                            5
+MARTIN                           6
+BLAKE                            5
+CLARK                            5
+SCOTT                            5
+KING                             4
+TURNER                           6
+ADAMS                            5
+
+ENAME                LENGTH(ENAME)
+-------------------- -------------
+JAMES                            5
+FORD                             4
+MILLER                           6
+
+已选择14行。
+      ##查询雇员长度为5
+      SQL> SET LINESIZE 300
+SQL> SELECT * FROM emp WHERE LENGTH(ename)=5 ;
+
+     EMPNO ENAME                JOB                       MGR HIREDATE              SAL       COMM     DEPTNO
+---------- -------------------- ------------------ ---------- -------------- ---------- ---------- ----------
+      7369 SMITH                CLERK                    7902 17-12月-80            800                 20
+      7499 ALLEN                SALESMAN                 7698 20-2月 -81           1600        300      30
+      7566 JONES                MANAGER                  7839 02-4月 -81           2975                 20
+      7698 BLAKE                MANAGER                  7839 01-5月 -81           2850                 30
+      7782 CLARK                MANAGER                  7839 09-6月 -81           2450                 10
+      7788 SCOTT                ANALYST                  7566 19-4月 -87           3000                 20
+      7876 ADAMS                CLERK                    7788 23-5月 -87           1100                 20
+      7900 JAMES                CLERK                    7698 03-12月-81            950                 30
+
+已选择8行。
+  ##字符串替换 
+      字符串 REPLACE(列|数据，要查找内容，新内容）
+      ###雇员姓名A替换为_
+      SQL> SELECT REPLACE(ename,UPPER('a'),'_') FROM emp;
+
+REPLACE(ENAME,UPPER(
+--------------------
+SMITH
+_LLEN
+W_RD
+JONES
+M_RTIN
+BL_KE
+CL_RK
+SCOTT
+KING
+TURNER
+_D_MS
+
+REPLACE(ENAME,UPPER(
+--------------------
+J_MES
+FORD
+MILLER
+    ##消除空格
+    SQL> SELECT REPLACE('hello world nihao fuck u',' ','') FROM dual;
+
+REPLACE('HELLOWORLDNIHAOFUCKU','','')
+----------------------------------------
+helloworldnihaofucku
+  ##字符串截取
+    字符串  SUBSTR(列|数据，开始点），从指定开始一直到结尾
+    字符串  SUBSTR(列|数据，开始点，长度），截取指定范围子字符串
+  SQL> SELECT SUBSTR('helloworldnihao',11) FROM dual;
+
+SUBSTR('HE
+----------
+nihao
+    SUBSTR()下标从1开始，即使初始是0，也从1开始
+    
+    ##雇员姓名前3位截取
+    SQL> SELECT JOB,SUBSTR(ename,0,3) FROM emp;
+
+JOB                SUBSTR(ENAME,0,3)
+------------------ ------------------------
+CLERK              SMI
+SALESMAN           ALL
+    ##后三位雇员名
+    使用负数索引
+    SQL> SELECT JOB,SUBSTR(ename,-3) FROM emp;
+
+JOB                SUBSTR(ENAME,-3)
+------------------ ------------------------
+CLERK              ITH
+SALESMAN           LEN
+SALESMAN           ARD
+MANAGER            NES
+SALESMAN           TIN
+MANAGER            AKE
+MANAGER            ARK
+ANALYST            OTT
+PRESIDENT          ING
+SALESMAN           NER
+CLERK              AMS
+
+JOB                SUBSTR(ENAME,-3)
+------------------ ------------------------
+CLERK              MES
+ANALYST            ORD
+CLERK              LER
+
+已选择14行。
+SALESMAN           WAR
+MANAGER            JON
+SALESMAN           MAR
+MANAGER            BLA
+MANAGER            CLA
+ANALYST            SCO
+PRESIDENT          KIN
+SALESMAN           TUR
+CLERK              ADA
+
+JOB                SUBSTR(ENAME,0,3)
+------------------ ------------------------
+CLERK              JAM
+ANALYST            FOR
+CLERK              MIL
+
+已选择14行。
+    ##上面这个不标准，只有oracle支持
+    ##一般SELECT JOB,SUBSTR(ename,LENGTH(ename)-2) FROM emp;
+  
+       
