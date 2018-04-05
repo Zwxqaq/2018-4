@@ -1,0 +1,141 @@
+不修改源代码（嵌套函数：将被修饰函数作为实参传入该装饰器），不修改调用方式（高阶函数：返回值是函数名）
+嵌套函数+高阶函数=装饰器
+import time
+def timmer(func):
+    def deco():
+        start_time=time.time()
+        func()
+        time.sleep(3)
+        stop_time=time.time()
+        print('start_time-stop_time=%s'%(stop_time-start_time))
+    return deco
+def test1():
+    print('in the test1')
+def test2():
+    print('in the test2')
+test1=timmer(test1)
+test1()
+test2=timmer(test2)
+test2()
+____________________________________________________________________________________
+@timmer+所需函数前面等价于test1=timmer（test1）
+import time
+def timmer(func):
+    def deco():
+        start_time=time.time()
+        func()
+        time.sleep(3)
+        stop_time=time.time()
+        print('start_time-stop_time=%s'%(stop_time-start_time))
+    return deco
+@timmer
+def test1():
+    print('in the test1')
+@timmer
+def test2():
+    print('in the test2')
+test1()
+test2()
+------------------------------------------------------------------------------------
+所需被修饰的函数中的装饰个数不固定采用*args，**kwargs一个类似列表，一个类似字典的东西，内存开销不变
+import time
+def timmer(func):
+    def deco(*args,**kwargs):
+        start_time=time.time()
+        func(*args,**kwargs)
+        time.sleep(3)
+        stop_time=time.time()
+        print('start_time-stop_time=%s'%(stop_time-start_time))
+    return deco
+@timmer
+def test1():
+    print('in the test1')
+@timmer
+def test2(name,age):
+    print('in the test2:name:%s,age:%s'%(name,age))
+test1()
+test2('zwx',22)
+——————————————————————————————————————————————————————————————————————————————————————————————
+当我们执行被装饰函数的返回值的时候，如果在装饰器中没有对该返回值进行返回，则会在调用的时候显示为None
+所以，我们必须将其进行返回
+#!/usr/bin/env python
+#Author:Alan Turing
+#  -*- coding:utf-8  -*-
+import time
+def auth(func):
+    def deco(*args,**kwargs):
+        user=input('input name:').strip()
+        password=input('input pass:').strip()
+        if user=='zwx' and password=='123':
+            res=func(*args,**kwargs)
+            return res
+        else:
+            exit('exit...')
+    return deco
+@auth
+def index(name):
+    print('welcome name:[%s] to index'%name)
+@auth
+def home():
+    print('welcome to home')
+    return 'from home'
+@auth
+def bbs():
+    print('welcome to bbs')
+index('lalala')
+x=home()
+print(x)
+bbs()
+___________________________________________________________________________________________________
+高潮版：分为本地和服务器双登录，即高阶函数，来进行一级一级判断，第一级判断登录类型，再修饰被装饰的函数
+切记：在这里@auth(auth_type=xxx)  对@auth---->进行@auth()操作  即func（）时为deco的返回值
+#!/usr/bin/env python
+#Author:Alan Turing
+#  -*- coding:utf-8  -*-
+import time
+def auth(auth_type):
+    def out_deco(func):
+        def deco(*args,**kwargs):
+            if auth_type=='local':
+                user=input('input name:').strip()
+                password=input('input pass:').strip()
+                if user=='zwx' and password=='123':
+                    res=func(*args,**kwargs)
+                    return res
+                else:
+                    exit('exit...')
+            else:
+                print('非本地登录，暂未开放')
+        return deco
+    return out_deco
+def index(name):
+    print('welcome name:[%s] to index'%name)
+@auth(auth_type='local')
+def home():
+    print('welcome to home')
+    return 'from home'
+@auth(auth_type='yucheng')
+def bbs():
+    print('welcome to bbs')
+index('lalala')
+x=home()
+print(x)
+bbs()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
